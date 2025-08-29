@@ -30,6 +30,9 @@ def scan(domains_file, logins_file, results_only=False):
     for domain in domains:
         headers = get_site_headers(domain)
         domain_has_results = False
+        
+        if not results_only:
+            print(f"--- Scanning: {domain} ---")
 
         for path in login_paths:
             url = f"{domain}{path}"
@@ -45,24 +48,18 @@ def scan(domains_file, logins_file, results_only=False):
                             found_words.append(kw)
 
                     if found_words:
-                        if not domain_has_results:
+                        if results_only and not domain_has_results:
                             print(f"--- Scanning: {domain} ---")
                             domain_has_results = True
                         print(f"[+] {url} -> {found_words}")
                     elif not results_only:
-                        if not domain_has_results:
-                            print(f"--- Scanning: {domain} ---")
-                            domain_has_results = True
                         print(f"[?] {url} -> Page exists but no login keywords found")
 
             except requests.RequestException:
                 if not results_only:
-                    if not domain_has_results:
-                        print(f"--- Scanning: {domain} ---")
-                        domain_has_results = True
                     print(f"[!] Could not connect to {url}")
 
-        if domain_has_results:
+        if domain_has_results or not results_only:
             print()
 
 if __name__ == "__main__":
